@@ -1,16 +1,43 @@
 import { MiddlewareConsumer, Module, NestModule } from '@nestjs/common';
-import { ConfigModule } from '@nestjs/config';
+import { ConfigModule, ConfigService } from '@nestjs/config';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { LoggerMiddleware } from './middlewares/logger.middleware';
+import { UsersModule } from './users/users.module';
+import { WorkspacesModule } from './workspaces/workspaces.module';
+import { ChannelsModule } from './channels/channels.module';
+import { DmsModule } from './dms/dms.module';
 
 @Module({
-  imports: [ConfigModule.forRoot()],
+  imports: [
+    ConfigModule.forRoot({ isGlobal: true }),
+    UsersModule,
+    WorkspacesModule,
+    ChannelsModule,
+    DmsModule,
+  ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, ConfigService],
+  // [ 원래 모습은 아래와 같으나, 위 처럼 줄일 수 있음 > 아래와 같이 쓸 경우 사용할 때 다르게 씀 -> controller 체크
+  //  {
+  //    provide: AppService, > '고유한 키'가 들어감, 클래스를 넣는다면 클래스 이름을 고유한 키로 사용하여 작동함
+  //    useClass: AppService, > '값'이 들어감, 그 키에 대해서 이 값을 쓰겠다 라는 의미
+  //  },
+  //  {
+  //    provide: 'custom_key'
+  //    useClass: custom_value
+  //  },
+  //  {
+  //    provide: AppService,
+  //    useFactory: () => {
+  //        별의 별 작업
+  //      return {}
+  //}
+  //  }
+  // ]
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer): any {
-    consumer.apply(LoggerMiddleware).forRoutes('*');
+    consumer.apply(LoggerMiddleware).forRoutes('*'); //미들웨어는 consumer에 연결한다.
   }
 }
