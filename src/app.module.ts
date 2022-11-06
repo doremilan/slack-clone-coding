@@ -7,6 +7,7 @@ import { UsersModule } from './users/users.module';
 import { WorkspacesModule } from './workspaces/workspaces.module';
 import { ChannelsModule } from './channels/channels.module';
 import { DmsModule } from './dms/dms.module';
+import { TypeOrmModule } from '@nestjs/typeorm';
 
 @Module({
   imports: [
@@ -15,6 +16,19 @@ import { DmsModule } from './dms/dms.module';
     WorkspacesModule,
     ChannelsModule,
     DmsModule,
+    TypeOrmModule.forRoot({
+      type: 'mysql',
+      port: 3306,
+      username: process.env.DB_USERNAME,
+      password: process.env.DB_PASSWORD,
+      database: process.env.DB_DATABASE,
+      autoLoadEntites: true,
+      entities: [], //'entities/*.js'
+      synchronize: true, //한번 연결 후 false로 바꿔줘야함
+      logging: true,
+      keepConnectionAlive: true,
+      charset: 'utf8mb4', //이모티콘 사용을 위해 추가
+    }),
   ],
   controllers: [AppController],
   providers: [AppService, ConfigService],
